@@ -3,9 +3,9 @@ import sys
 import requests
 import re
 import subprocess
-import platform
 from urllib.parse import urljoin
 from bs4 import BeautifulSoup
+
 
 def get_ip(domain):
     print(f"\n--- Resolving IP for {domain} ---")
@@ -24,9 +24,9 @@ def get_ip(domain):
 
 def scan_ports(ip):
     print(f"\n--- Scanning Common Ports on {ip} ---")
-    communs_ports = [21, 22, 25, 80, 110, 443, 8080, 8443]
+    common_ports = [21, 22, 25, 80, 110, 443, 8080, 8443]
 
-    for port in communs_ports:
+    for port in common_ports:
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         sock.settimeout(1)
 
@@ -42,7 +42,7 @@ def scan_ports(ip):
         finally:
             sock.close()
 
-    print("--- Port Scann Finished ---")
+    print("--- Port Scan Finished ---")
 
 
 def get_web_info(url):
@@ -50,12 +50,12 @@ def get_web_info(url):
 
     try:
         response_main = requests.get(url, timeout=5)
-        
+
         server_header = response_main.headers.get("Server")
         if server_header:
             print(f"[*] Server Header: {server_header}")
         else:
-            print(f"[-] Server Header not found.")
+            print("[-] Server Header not found.")
 
         robots_url = urljoin(url, "/robots.txt")
         response_robots = requests.get(robots_url, timeout=5)
@@ -108,7 +108,7 @@ def scrape_page(url):
 
 
 def run_nmap_scan(ip):
-    target_ip = ip
+    print(f"\n--- Running Nmap Fast Scan on {ip} ---")
     print(f"[*] Performing a fast scan on top 100 ports for {ip}...")
 
     command = ['nmap', '-F', ip]
@@ -147,6 +147,7 @@ def main():
 
     if target_ip:
         scan_ports(target_ip)
+        run_nmap_scan(target_ip)
 
     get_web_info(target_url)
     scrape_page(target_url)
